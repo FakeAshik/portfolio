@@ -45,6 +45,7 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
+        touch-action: pan-x pan-y; /* Disable zoom gestures, allow scrolling */
       }
       /* Hide scrollbar for Chrome, Safari and Opera */
       .no-scrollbar::-webkit-scrollbar {
@@ -56,6 +57,28 @@
           scrollbar-width: none;  /* Firefox */
       }
     </style>
+    <script>
+      // Strict zoom prevention for iOS Safari which ignores user-scalable=no
+      document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+      });
+      document.addEventListener('gesturechange', function(e) {
+        e.preventDefault();
+      }); 
+      document.addEventListener('gestureend', function(e) {
+        e.preventDefault();
+      });
+
+      // Prevent double-tap to zoom on iOS
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+    </script>
   <script type="importmap">
 {
   "imports": {
