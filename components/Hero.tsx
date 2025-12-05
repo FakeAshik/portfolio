@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { HERO_TAGLINE, HERO_SUBTEXT, SKILLS } from '../constants';
@@ -8,14 +7,14 @@ const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
-  // Parallax transforms - optimized ranges for smoothness
+  // Parallax transforms for background and text
   const yBackground = useTransform(scrollY, [0, 1000], [0, 300]);
   const yText = useTransform(scrollY, [0, 500], [0, 150]);
-  const yCards = useTransform(scrollY, [0, 500], [0, -100]); 
   const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
-  
-  // Reduced rotation intensity for smoother feel
-  const rotateCards = useTransform(scrollY, [0, 500], [0, 5]);
+
+  // Split skills into two rows for the "Left-Right" linear movement
+  const row1Skills = SKILLS.slice(0, 2);
+  const row2Skills = SKILLS.slice(2, 4);
 
   return (
     <section 
@@ -27,7 +26,6 @@ const Hero: React.FC = () => {
         style={{ y: yBackground }}
         className="absolute inset-0 z-0 will-change-transform"
       >
-        {/* Using mix-blend-screen for better blending and performance */}
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px] animate-blob mix-blend-screen" />
         <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] animate-blob animation-delay-4000 mix-blend-screen" />
@@ -36,62 +34,63 @@ const Hero: React.FC = () => {
       {/* Fade to black gradient at the bottom for smooth transition */}
       <div className="absolute bottom-0 inset-x-0 h-[500px] bg-gradient-to-t from-black via-black/80 to-transparent z-0 pointer-events-none" />
 
-      <div className="container mx-auto px-4 z-10 relative flex flex-col items-center">
+      {/* Main Content Container */}
+      <div className="container mx-auto px-4 z-10 relative flex flex-col items-center mt-16">
         
-        {/* Floating Abstract Elements (Simulating 3D depth) */}
-        <div className="absolute inset-0 pointer-events-none">
-          {SKILLS.map((skill, index) => (
-            // Wrapper handles the Scroll Parallax
-            <motion.div
-              key={skill.name}
-              style={{ y: yCards, rotate: rotateCards }}
-              className={`absolute will-change-transform
-                ${index === 0 ? 'top-[15%] left-[10%]' : ''}
-                ${index === 1 ? 'top-[20%] right-[15%]' : ''}
-                ${index === 2 ? 'bottom-[25%] left-[15%]' : ''}
-                ${index === 3 ? 'bottom-[15%] right-[20%]' : ''}
-              `}
-            >
-              {/* Inner Child handles the Continuous Fluid Floating Animation */}
+        {/* Row 1: Linear Movement LEFT <-> RIGHT */}
+        <div className="absolute top-[10%] w-full flex justify-center pointer-events-none">
+          <motion.div 
+            className="flex gap-32"
+            animate={{ x: ["-15vw", "15vw"] }}
+            transition={{ 
+              duration: 20, 
+              repeat: Infinity, 
+              repeatType: "mirror", 
+              ease: "linear" 
+            }}
+          >
+            {row1Skills.map((skill, index) => (
               <motion.div
-                 className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-2xl"
-                 initial={{ opacity: 0, scale: 0.5 }}
-                 animate={{ 
-                   opacity: 0.9, 
-                   scale: 1,
-                   // Complex fluid motion: Y float + X drift + slight rotation
-                   y: [0, -20, 0],
-                   x: [0, 10, 0], 
-                   rotate: [0, 3, -3, 0]
-                 }}
-                 transition={{ 
-                   opacity: { duration: 1.2, delay: 0.5 + index * 0.2 },
-                   scale: { duration: 1.2, delay: 0.5 + index * 0.2 },
-                   // Loop transitions - desynchronized durations create organic feel
-                   y: { 
-                     duration: 6 + index, // Slower, smoother
-                     repeat: Infinity, 
-                     ease: "easeInOut",
-                     times: [0, 0.5, 1] 
-                   },
-                   x: {
-                     duration: 7 + index, // Different duration to desync X/Y (Lissajous-like)
-                     repeat: Infinity,
-                     ease: "easeInOut"
-                   },
-                   rotate: {
-                     duration: 8 + index,
-                     repeat: Infinity,
-                     ease: "easeInOut"
-                   }
-                 }}
+                key={skill.name}
+                className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-2xl"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 0.8, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.2, duration: 1 }}
               >
                 <skill.icon size={20} className="text-white/90" />
                 <span className="text-xs font-medium text-white/90 hidden md:inline">{skill.name}</span>
               </motion.div>
-            </motion.div>
-          ))}
+            ))}
+          </motion.div>
         </div>
+
+        {/* Row 2: Linear Movement RIGHT <-> LEFT */}
+        <div className="absolute bottom-[20%] w-full flex justify-center pointer-events-none">
+          <motion.div 
+             className="flex gap-48"
+             animate={{ x: ["15vw", "-15vw"] }}
+             transition={{ 
+               duration: 25, 
+               repeat: Infinity, 
+               repeatType: "mirror", 
+               ease: "linear" 
+             }}
+          >
+            {row2Skills.map((skill, index) => (
+              <motion.div
+                key={skill.name}
+                className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 0.8, y: 0 }}
+                transition={{ delay: 0.8 + index * 0.2, duration: 1 }}
+              >
+                <skill.icon size={20} className="text-white/90" />
+                <span className="text-xs font-medium text-white/90 hidden md:inline">{skill.name}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
 
         {/* Central Avatar/Subject */}
         <motion.div
@@ -128,7 +127,7 @@ const Hero: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
         >
-          <h1 className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40 drop-shadow-2xl">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40 drop-shadow-2xl">
             {HERO_TAGLINE}
           </h1>
           <motion.p 

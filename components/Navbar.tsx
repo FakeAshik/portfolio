@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Menu, X, ArrowUpRight, Instagram, Mail, Linkedin } from 'lucide-react';
 
 const navItems = [
@@ -21,7 +21,46 @@ const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
     if (element) {
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth' });
-      }, 500); // Wait for menu close animation
+      }, 600); // Wait for menu close animation
+    }
+  };
+
+  // Variants for staggered cinematic entrance
+  const menuContainerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+      }
+    }
+  };
+
+  const menuItemVariants: Variants = {
+    hidden: { y: 40, opacity: 0, filter: 'blur(10px)' },
+    visible: { 
+      y: 0, 
+      opacity: 1, 
+      filter: 'blur(0px)',
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }
+    },
+    exit: { 
+      y: 20, 
+      opacity: 0, 
+      filter: 'blur(5px)',
+      transition: { duration: 0.2 } 
     }
   };
 
@@ -48,25 +87,25 @@ const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
           className="pointer-events-auto cursor-pointer group relative z-50"
           onClick={onToggle}
         >
-          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-full p-3 shadow-lg transition-all duration-300 group-hover:bg-white/20 active:scale-95">
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-full p-3 shadow-lg transition-all duration-300 group-hover:bg-white/20 active:scale-95 hover:rotate-90">
             <AnimatePresence mode="wait" initial={false}>
               {isOpen ? (
                 <motion.div
                   key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ scale: 0.5, rotate: -90, opacity: 0 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                  exit={{ scale: 0.5, rotate: 90, opacity: 0 }}
+                  transition={{ type: "spring", duration: 0.4 }}
                 >
                   <X className="text-white w-6 h-6" />
                 </motion.div>
               ) : (
                 <motion.div
                   key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ scale: 0.5, rotate: 90, opacity: 0 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                  exit={{ scale: 0.5, rotate: -90, opacity: 0 }}
+                  transition={{ type: "spring", duration: 0.4 }}
                 >
                   <Menu className="text-white w-6 h-6" />
                 </motion.div>
@@ -80,31 +119,30 @@ const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
-            exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-            transition={{ duration: 0.7, ease: [0.32, 0, 0.24, 1] }} // Smooth easing
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-3xl"
+            initial={{ clipPath: "circle(0% at 100% 0%)" }}
+            animate={{ clipPath: "circle(150% at 100% 0%)" }}
+            exit={{ clipPath: "circle(0% at 100% 0%)" }}
+            transition={{ duration: 0.8, ease: [0.32, 0, 0.24, 1] }} // Custom bezier for premium feel
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-[40px]"
           >
             {/* Background Texture/Noise could go here */}
             
-            <div className="w-full max-w-lg px-6">
-              <nav className="flex flex-col space-y-2">
+            <motion.div 
+              className="w-full max-w-lg px-6"
+              variants={menuContainerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <nav className="flex flex-col space-y-3">
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.label}
-                    initial={{ x: 50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 50, opacity: 0 }}
-                    transition={{ 
-                      delay: 0.1 + index * 0.1, 
-                      duration: 0.5, 
-                      ease: "easeOut" 
-                    }}
+                    variants={menuItemVariants}
                   >
                     <button
                       onClick={() => scrollToSection(item.href)}
-                      className="group w-full flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors duration-300"
+                      className="group w-full flex items-center justify-between p-6 rounded-[32px] bg-white/5 border border-white/5 hover:bg-white/10 transition-colors duration-300"
                     >
                       <div className="flex items-center gap-6">
                         <span className="text-xs font-mono text-white/40 border border-white/10 px-2 py-1 rounded-md">
@@ -121,10 +159,7 @@ const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
               </nav>
 
               <motion.div 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 20, opacity: 0 }}
-                transition={{ delay: 0.4 }}
+                variants={menuItemVariants}
                 className="mt-12 flex justify-center gap-6"
               >
                  {/* Social Mini Links */}
@@ -132,13 +167,13 @@ const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
                    <a 
                      key={i} 
                      href="#" 
-                     className="p-4 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all hover:scale-110"
+                     className="p-4 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all hover:scale-110 active:scale-90"
                    >
                      <Icon size={20} />
                    </a>
                  ))}
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
