@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
       </motion.div>
 
       {/* Fade to black gradient at the bottom for smooth transition */}
-      <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-black via-black/60 to-transparent z-0 pointer-events-none" />
+      <div className="absolute bottom-0 inset-x-0 h-96 bg-gradient-to-t from-black via-black/80 to-transparent z-0 pointer-events-none" />
 
       <div className="container mx-auto px-4 z-10 relative flex flex-col items-center">
         
