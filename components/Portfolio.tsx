@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PROJECTS } from '../constants';
@@ -53,9 +54,10 @@ const Portfolio: React.FC = () => {
                 key={project.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 onClick={() => setSelectedProject(project)}
                 className={`cursor-pointer group ${project.category === ProjectCategory.REELS || project.category === ProjectCategory.SHORTS ? 'row-span-2' : 'row-span-1'}`}
               >
