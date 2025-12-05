@@ -1,23 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Instagram, Linkedin, Send } from 'lucide-react';
 
-const Contact: React.FC = () => {
+interface ContactProps {
+  isMenuOpen?: boolean;
+}
+
+const Contact: React.FC<ContactProps> = ({ isMenuOpen = false }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  // Trigger entrance animation after a delay (simulating cinematic intro)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasLoaded(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Determine if the element should be hidden (during initial load or when menu is open)
+  const isHidden = !hasLoaded || isMenuOpen;
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full px-4 flex justify-center">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full px-4 flex justify-center pointer-events-none">
       <motion.div
         layout
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-black/80 backdrop-blur-2xl border border-white/15 shadow-2xl overflow-hidden"
-        initial={{ borderRadius: 32, width: "auto" }}
+        className="bg-black/80 backdrop-blur-2xl border border-white/15 shadow-2xl overflow-hidden pointer-events-auto"
+        initial={{ 
+          borderRadius: 32, 
+          width: 200, 
+          y: 200, // Start off-screen
+          opacity: 0 
+        }}
         animate={{ 
           width: isHovered ? 380 : 200,
-          borderRadius: 32
+          borderRadius: 32,
+          y: isHidden ? 200 : 0,
+          opacity: isHidden ? 0 : 1
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        transition={{ 
+          // Dynamic transition: Slow and cinematic for entrance, Snappy and fluid for interactions
+          type: "spring",
+          stiffness: hasLoaded ? 280 : 80, // Slower entrance, faster toggle
+          damping: hasLoaded ? 30 : 20,
+          mass: 1
+        }}
       >
         <div className="h-16 flex items-center justify-between px-2 relative">
            

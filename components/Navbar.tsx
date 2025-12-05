@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowUpRight, Instagram, Mail, Linkedin } from 'lucide-react';
 
@@ -9,16 +8,20 @@ const navItems = [
   { label: 'About', href: '#about', sub: '03' },
 ];
 
-const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface NavbarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-
+const Navbar: React.FC<NavbarProps> = ({ isOpen, onToggle }) => {
+  
   const scrollToSection = (href: string) => {
-    setIsOpen(false);
+    onToggle(); // Close menu
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }, 500); // Wait for menu close animation
     }
   };
 
@@ -33,7 +36,7 @@ const Navbar: React.FC = () => {
         {/* Logo - NJ */}
         <div 
           className="pointer-events-auto cursor-pointer group relative z-50"
-          onClick={() => scrollToSection('#home')}
+          onClick={() => { if(isOpen) onToggle(); scrollToSection('#home'); }}
         >
           <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-2 shadow-lg transition-transform duration-300 group-hover:scale-105 active:scale-95">
             <span className="font-black text-xl tracking-tighter text-white">NJ</span>
@@ -43,7 +46,7 @@ const Navbar: React.FC = () => {
         {/* Menu Button */}
         <div 
           className="pointer-events-auto cursor-pointer group relative z-50"
-          onClick={toggleMenu}
+          onClick={onToggle}
         >
           <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-full p-3 shadow-lg transition-all duration-300 group-hover:bg-white/20 active:scale-95">
             <AnimatePresence mode="wait" initial={false}>

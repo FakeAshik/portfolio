@@ -8,28 +8,29 @@ const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
-  // Parallax transforms
-  const yBackground = useTransform(scrollY, [0, 1000], [0, 400]);
-  const yText = useTransform(scrollY, [0, 500], [0, 200]);
-  const yCards = useTransform(scrollY, [0, 500], [0, -150]);
+  // Parallax transforms - optimized ranges for smoothness
+  const yBackground = useTransform(scrollY, [0, 1000], [0, 300]);
+  const yText = useTransform(scrollY, [0, 500], [0, 150]);
+  const yCards = useTransform(scrollY, [0, 500], [0, -100]); 
   const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
   
   // Reduced rotation intensity for smoother feel
-  const rotateCards = useTransform(scrollY, [0, 500], [0, 10]);
+  const rotateCards = useTransform(scrollY, [0, 500], [0, 5]);
 
   return (
     <section 
       ref={containerRef} 
-      className="relative h-screen w-full flex items-center justify-center overflow-hidden"
+      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* Dynamic Aurora Background */}
+      {/* Dynamic Aurora Background - Promoted to GPU Layer */}
       <motion.div 
         style={{ y: yBackground }}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 will-change-transform"
       >
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/30 rounded-full blur-[120px] animate-blob" />
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px] animate-blob animation-delay-2000" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
+        {/* Using mix-blend-screen for better blending and performance */}
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px] animate-blob mix-blend-screen" />
+        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] animate-blob animation-delay-4000 mix-blend-screen" />
       </motion.div>
 
       {/* Fade to black gradient at the bottom for smooth transition */}
@@ -44,30 +45,44 @@ const Hero: React.FC = () => {
             <motion.div
               key={skill.name}
               style={{ y: yCards, rotate: rotateCards }}
-              className={`absolute
+              className={`absolute will-change-transform
                 ${index === 0 ? 'top-[15%] left-[10%]' : ''}
                 ${index === 1 ? 'top-[20%] right-[15%]' : ''}
                 ${index === 2 ? 'bottom-[25%] left-[15%]' : ''}
                 ${index === 3 ? 'bottom-[15%] right-[20%]' : ''}
               `}
             >
-              {/* Inner Child handles the Continuous Floating Animation */}
+              {/* Inner Child handles the Continuous Fluid Floating Animation */}
               <motion.div
-                 className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-xl"
+                 className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-2xl"
                  initial={{ opacity: 0, scale: 0.5 }}
                  animate={{ 
-                   opacity: 0.8, 
-                   scale: 1, 
-                   y: [0, -15, 0] // Gentle float
+                   opacity: 0.9, 
+                   scale: 1,
+                   // Complex fluid motion: Y float + X drift + slight rotation
+                   y: [0, -20, 0],
+                   x: [0, 10, 0], 
+                   rotate: [0, 3, -3, 0]
                  }}
                  transition={{ 
-                   opacity: { duration: 1, delay: 0.5 + index * 0.2 },
-                   scale: { duration: 1, delay: 0.5 + index * 0.2 },
+                   opacity: { duration: 1.2, delay: 0.5 + index * 0.2 },
+                   scale: { duration: 1.2, delay: 0.5 + index * 0.2 },
+                   // Loop transitions - desynchronized durations create organic feel
                    y: { 
-                     duration: 4 + index, // Varied duration for organic feel
+                     duration: 6 + index, // Slower, smoother
                      repeat: Infinity, 
                      ease: "easeInOut",
-                     delay: index * 0.5 // Staggered start
+                     times: [0, 0.5, 1] 
+                   },
+                   x: {
+                     duration: 7 + index, // Different duration to desync X/Y (Lissajous-like)
+                     repeat: Infinity,
+                     ease: "easeInOut"
+                   },
+                   rotate: {
+                     duration: 8 + index,
+                     repeat: Infinity,
+                     ease: "easeInOut"
                    }
                  }}
               >
@@ -85,7 +100,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 1.2, type: "spring", bounce: 0.3 }}
           className="mb-8 relative group cursor-pointer"
         >
-          <div className="w-32 h-32 md:w-48 md:h-48 rounded-[40px] overflow-hidden border-2 border-white/20 shadow-[0_0_80px_rgba(255,255,255,0.15)] relative transform transition-transform duration-500 hover:scale-105">
+          <div className="w-32 h-32 md:w-48 md:h-48 rounded-[40px] overflow-hidden border-2 border-white/20 shadow-[0_0_80px_rgba(255,255,255,0.15)] relative transform transition-transform duration-500 hover:scale-105 will-change-transform">
              <img 
                src="https://picsum.photos/id/64/400/400" 
                alt="Nihad Jim" 

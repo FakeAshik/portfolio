@@ -1,6 +1,4 @@
-
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import Hero from './components/Hero';
 import Portfolio from './components/Portfolio';
 import About from './components/About';
@@ -8,11 +6,13 @@ import Contact from './components/Contact';
 import Navbar from './components/Navbar';
 
 const App: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
       
-      {/* Fixed Navbar */}
-      <Navbar />
+      {/* Fixed Navbar with controlled state */}
+      <Navbar isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
 
       {/* Section 1: Hero */}
       <section id="home">
@@ -34,13 +34,8 @@ const App: React.FC = () => {
       <div className="h-32" />
 
       {/* Fixed UI Elements */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-      >
-        <Contact />
-      </motion.div>
+      {/* Moved animation logic inside Contact for better coordination with menu state */}
+      <Contact isMenuOpen={isMenuOpen} />
 
       {/* Global Gradient Overlay for cinematic feel */}
       <div className="fixed inset-0 bg-gradient-to-tr from-blue-900/5 via-transparent to-purple-900/5 pointer-events-none z-0" />
